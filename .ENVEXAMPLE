@@ -1,0 +1,15 @@
+# Database
+MYSQL_DATABASE_USER=root
+MYSQL_DATABASE_PASSWORD=12345678
+MYSQL_DATABASE_HOST=localhost
+MYSQL_DATABASE_PORT=3306
+MYSQL_DATABASE_NAME=ortho
+
+# Email Provider
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER="username"
+SMTP_PASSWORD="password"
+
+# JWT Token
+JWT_SECRET=strong_random_text

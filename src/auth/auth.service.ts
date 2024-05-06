@@ -1,0 +1,132 @@
+import { TypeOrmQueryService } from "@nestjs-query/query-typeorm";
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+  forwardRef,
+} from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import { InjectRepository } from "@nestjs/typeorm";
+import DeviceDetector from "node-device-detector";
+import { comparePasswords } from "src/decorators/hash-password/helper";
+import { User } from "src/user/entities/user.entity";
+import { UserService } from "src/user/user.service";
+import { Repository } from "typeorm";
+import { DetailedSession } from "./dto/detailed-session.dto";
+import { SignInDto } from "./dto/singin.dto";
+import { Session } from "./entities/session.entity";
+import { SignUpRequestDto } from "./dto/singup-request.dto";
+import { SignUpDto } from "./dto/singup.dto";
+import { CreateUserDto } from "src/user/dto/create-user.dto";
+import { plainToInstance } from "class-transformer";
+
+const deviceDetector = new DeviceDetector({
+  clientIndexes: true,
+  deviceIndexes: true,
+  deviceAliasCode: false,
+});
+
+@Injectable()
+export class AuthService extends TypeOrmQueryService<Session> {
+  constructor(
+    private readonly jwtService: JwtService,
+    @Inject(forwardRef(() => UserService))
+    private readonly userService: UserService,
+    @InjectRepository(Session)
+    public sessionRepository: Repository<Session>,
+  ) {
+    super(sessionRepository, { useSoftDelete: true });
+  }
+
+  async requestSignUp(singUpReqDto: SignUpRequestDto) {
+    const payload = {
+      name: singUpReqDto.name,
+      username: singUpReqDto.username,
+      email: singUpReqDto.email,
+    };
+
+    const usernameFind = await this.userService.findOneByUsername(
+      payload.username,
+    );
+    const emailFind = await this.userService.findOneByEmail(payload.email);
+    const errors = [];
+
+    if (usernameFind) {
+      errors.push("username already exists");
+    }
+
+    if (emailFind) {
+      errors.push("email already exists");
+    }
+
+    if (errors.length) {
+      throw new BadRequestException(errors);
+    }
+
+    const continuationKey = await this.jwtService.signAsync(payload, {
+      expiresIn: "15m",
+    });
+
+    return { continuationKey };
+  }
+
+  async signUp(singUpDto: SignUpDto) {
+    const { continuationKey, password } = singUpDto;
+    const payload = (await this.jwtService.verifyAsync(continuationKey)) as {
+      name: string;
+      username: string;
+      email: string;
+    };
+
+    const user = new CreateUserDto();
+    user.name = payload.name;
+    user.username = payload.username;
+    user.email = payload.email;
+    user.password = password;
+
+    return this.userService.createOne(plainToInstance(CreateUserDto, user));
+  }
+
+  async signIn(signInDto: SignInDto): Promise<User> {
+    const { identifier, password } = signInDto;
+    const user = await this.userService.findOneByEmailOrUsername(identifier);
+
+    if (!user || !(await comparePasswords(password, user.password))) {
+      throw new UnauthorizedException("Invalid credentials");
+    }
+
+    return user;
+  }
+
+  async generateJwtToken(
+    user: User,
+    headers: { "user-agent"?: string },
+  ): Promise<string> {
+    // Generate a new JWT token for the session
+    const payload = { sub: user.id, username: user.username };
+    const accessToken = await this.jwtService.signAsync(payload);
+
+    // Create a new session and store the JWT token in the session
+    const session = new Session();
+    session.sessionToken = accessToken;
+    session.userId = user.id;
+    session.userAgent = headers["user-agent"];
+    // Save the session in the database
+    await this.sessionRepository.save(session);
+    return accessToken;
+  }
+
+  async tokenInfo(tokenSignature: string) {
+    const session = (await this.sessionRepository.findOneByOrFail({
+      tokenSignature,
+    })) as DetailedSession;
+
+    session.device = deviceDetector.detect(session.userAgent);
+    return session;
+  }
+
+  async logout(tokenSignature: string) {
+    return this.sessionRepository.softDelete({ tokenSignature });
+  }
+}
