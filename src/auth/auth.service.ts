@@ -42,26 +42,13 @@ export class AuthService extends TypeOrmQueryService<Session> {
   async requestSignUp(singUpReqDto: SignUpRequestDto) {
     const payload = {
       name: singUpReqDto.name,
-      username: singUpReqDto.username,
       email: singUpReqDto.email,
     };
 
-    const usernameFind = await this.userService.findOneByUsername(
-      payload.username,
-    );
     const emailFind = await this.userService.findOneByEmail(payload.email);
-    const errors = [];
-
-    if (usernameFind) {
-      errors.push("username already exists");
-    }
 
     if (emailFind) {
-      errors.push("email already exists");
-    }
-
-    if (errors.length) {
-      throw new BadRequestException(errors);
+      throw new BadRequestException("email already exists");
     }
 
     const continuationKey = await this.jwtService.signAsync(payload, {
@@ -75,13 +62,11 @@ export class AuthService extends TypeOrmQueryService<Session> {
     const { continuationKey, password } = singUpDto;
     const payload = (await this.jwtService.verifyAsync(continuationKey)) as {
       name: string;
-      username: string;
       email: string;
     };
 
     const user = new CreateUserDto();
     user.name = payload.name;
-    user.username = payload.username;
     user.email = payload.email;
     user.password = password;
 
@@ -90,7 +75,7 @@ export class AuthService extends TypeOrmQueryService<Session> {
 
   async signIn(signInDto: SignInDto): Promise<User> {
     const { identifier, password } = signInDto;
-    const user = await this.userService.findOneByEmailOrUsername(identifier);
+    const user = await this.userService.findOneByEmail(identifier);
 
     if (!user || !(await comparePasswords(password, user.password))) {
       throw new UnauthorizedException("Invalid credentials");
@@ -104,7 +89,7 @@ export class AuthService extends TypeOrmQueryService<Session> {
     headers: { "user-agent"?: string },
   ): Promise<string> {
     // Generate a new JWT token for the session
-    const payload = { sub: user.id, username: user.username };
+    const payload = { sub: user.id };
     const accessToken = await this.jwtService.signAsync(payload);
 
     // Create a new session and store the JWT token in the session

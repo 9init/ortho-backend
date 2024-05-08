@@ -26,10 +26,6 @@ export class User implements CreateUserDto {
   @Index("idx_user_name")
   name: string;
 
-  @Column({ unique: true })
-  @Index("idx_user_username")
-  username: string;
-
   @Column({ unique: true, nullable: false })
   @Index("idx_user_email")
   email: string;

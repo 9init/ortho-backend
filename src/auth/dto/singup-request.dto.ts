@@ -1,5 +1,4 @@
 import { IsEmail, IsNotEmpty, Matches, MinLength } from "class-validator";
-import { IsUsername } from "src/decorators/isUsername";
 
 export class SignUpRequestDto {
   @MinLength(3)
@@ -11,8 +10,4 @@ export class SignUpRequestDto {
   @IsNotEmpty()
   @IsEmail()
   email: string;
-
-  @IsNotEmpty()
-  @IsUsername()
-  username: string;
 }
