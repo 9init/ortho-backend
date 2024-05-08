@@ -36,7 +36,7 @@ export class ScanService {
 
     const scanModel = await this.scanRepository.create(scanData);
     const scan = await this.scanRepository.save(scanModel);
-    scan.image = "/scan/image/" + scan.id;
+    scan.image = process.env.HOST + "/scan/image/" + scan.id;
     return scan;
   }
 
@@ -51,9 +51,13 @@ export class ScanService {
   }
 
   async getRecentScans(user: User): Promise<Scan[]> {
-    return await this.scanRepository.find({
+    const scans = await this.scanRepository.find({
       where: { userId: user.id },
       order: { createdAt: "DESC" },
     });
+    scans.forEach((scan) => {
+      scan.image = process.env.HOST + "/scan/image/" + scan.id;
+    });
+    return scans;
   }
 }

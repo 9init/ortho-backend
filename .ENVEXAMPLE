@@ -13,3 +13,6 @@ SMTP_PASSWORD="password"
 
 # JWT Token
 JWT_SECRET=strong_random_text
+
+# HOST URL
+HOST=http://localhost:3000

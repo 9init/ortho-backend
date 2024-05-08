@@ -38,6 +38,6 @@ export class ScanController {
     @Res() res: Response,
   ) {
     const imageBuffer = await this.scanService.getImage(user, id);
-    res.send(imageBuffer);
+    res.send(Buffer.from(imageBuffer, "base64"));
   }
 }
