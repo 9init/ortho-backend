@@ -32,7 +32,7 @@ export class ScanService {
     const scanData: Scan = new Scan();
     scanData.userId = user.id;
     scanData.data = [lipline, buccalCorridor];
-    scanData.image = compressedImage;
+    scanData.image = compressedImage.toString();
 
     const scanModel = await this.scanRepository.create(scanData);
     const scan = await this.scanRepository.save(scanModel);
@@ -47,7 +47,8 @@ export class ScanService {
       throw new BadRequestException("Scan not found");
     }
 
-    return scan.image;
+    const base64Image = scan.image.toString();
+    return Buffer.from(base64Image, "base64");
   }
 
   async getRecentScans(user: User): Promise<Scan[]> {
