@@ -39,6 +39,7 @@ export class AuthController {
       secure: process.env.NODE_ENV == "production", // Set to true in production for HTTPS
       sameSite: "strict", // Prevent CSRF attacks
       path: "/", // To make all paths valid for cookies
+      domain: process.env.HOST_DOMAIN, // Set the domain for the cookie
     });
 
     return user;
