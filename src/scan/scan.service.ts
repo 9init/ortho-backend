@@ -40,8 +40,8 @@ export class ScanService {
     return scan;
   }
 
-  async getImage(user: User, id: number) {
-    const scan = await this.scanRepository.findOneBy({ id, userId: user.id });
+  async getImage(id: number) {
+    const scan = await this.scanRepository.findOneBy({ id });
 
     if (!scan) {
       throw new BadRequestException("Scan not found");
