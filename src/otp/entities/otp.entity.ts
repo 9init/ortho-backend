@@ -30,7 +30,7 @@ export class Otp {
   })
   otp: string;
 
-  @Column("enum")
+  @Column("enum", { enum: OtpType })
   type: OtpType;
 
   @Column("char", {

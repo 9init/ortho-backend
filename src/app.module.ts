@@ -9,6 +9,7 @@ import { OtpModule } from "./otp/otp.module";
 import { MailerModule } from "@nestjs-modules/mailer";
 import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter";
 import { join } from "path";
+import { Otp } from "./otp/entities/otp.entity";
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { join } from "path";
       username: process.env.MYSQL_DATABASE_USER,
       password: process.env.MYSQL_DATABASE_PASSWORD,
       database: process.env.MYSQL_DATABASE_NAME,
-      entities: [Session, User],
+      entities: [Session, User, Otp],
       synchronize: true,
     }),
     MailerModule.forRoot({
