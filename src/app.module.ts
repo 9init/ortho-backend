@@ -5,6 +5,10 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "./user/entities/user.entity";
 import { ConfigModule } from "@nestjs/config";
 import { Session } from "./auth/entities/session.entity";
+import { OtpModule } from "./otp/otp.module";
+import { MailerModule } from "@nestjs-modules/mailer";
+import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter";
+import { join } from "path";
 
 @Module({
   imports: [
@@ -22,8 +26,26 @@ import { Session } from "./auth/entities/session.entity";
       entities: [Session, User],
       synchronize: true,
     }),
+    MailerModule.forRoot({
+      transport: {
+        host: process.env.SMTP_HOST,
+        port: parseInt(process.env.SMTP_PORT),
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASSWORD,
+        },
+      },
+      template: {
+        dir: join(__dirname, "templates"),
+        adapter: new HandlebarsAdapter(),
+        options: {
+          strict: true,
+        },
+      },
+    }),
     AuthModule,
     UserModule,
+    OtpModule,
   ],
   controllers: [],
   providers: [],

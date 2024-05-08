@@ -1,9 +1,8 @@
-import { IsNotEmpty, IsString } from "class-validator";
-import { IsUsernameOrEmail } from "src/decorators/isUsernameOrEmail";
+import { IsEmail, IsNotEmpty, IsString } from "class-validator";
 
 export class SignInDto {
   @IsString()
-  @IsUsernameOrEmail()
+  @IsEmail()
   @IsNotEmpty()
   identifier: string;
 

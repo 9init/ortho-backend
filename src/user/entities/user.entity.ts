@@ -5,10 +5,12 @@ import {
   BeforeInsert,
   Index,
   DeleteDateColumn,
+  OneToMany,
 } from "typeorm";
 import { ulid } from "ulid";
 import { Exclude } from "class-transformer";
 import { CreateUserDto } from "../dto/create-user.dto";
+import { Otp } from "src/otp/entities/otp.entity";
 
 @Entity()
 export class User implements CreateUserDto {
@@ -36,4 +38,9 @@ export class User implements CreateUserDto {
 
   @DeleteDateColumn()
   deletedAt?: Date;
+
+  // Relations
+  // join otps table using user_id and where otp.isUsed = false and otp.expiresAt > now()
+  @OneToMany(() => Otp, (otp) => otp.user)
+  otps: Otp[];
 }

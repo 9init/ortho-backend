@@ -20,6 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs-query/query-typeorm": "^0.30.0",
     "@nestjs/class-transformer": "^0.4.0",
     "@nestjs/common": "^10.0.0",

@@ -24,7 +24,7 @@ export class UserService {
     return this.userRepository.save(user).catch((err) => {
       console.log(err);
       if (err.code == "ER_DUP_ENTRY") {
-        throw new ConflictException("username or email already exists.");
+        throw new ConflictException("email already exists.");
       }
     });
   }
@@ -32,6 +32,9 @@ export class UserService {
   async findOne(id: string): Promise<User | undefined> {
     const user = await this.userRepository.findOne({
       where: { id },
+      relations: {
+        otps: true,
+      },
     });
 
     if (!user)
