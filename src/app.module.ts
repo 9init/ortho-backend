@@ -10,6 +10,9 @@ import { MailerModule } from "@nestjs-modules/mailer";
 import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter";
 import { join } from "path";
 import { Otp } from "./otp/entities/otp.entity";
+import { ScanModule } from "./scan/scan.module";
+import { HomeModule } from "./home/home.module";
+import { Scan } from "./scan/entities/scan.entity";
 
 @Module({
   imports: [
@@ -24,7 +27,7 @@ import { Otp } from "./otp/entities/otp.entity";
       username: process.env.MYSQL_DATABASE_USER,
       password: process.env.MYSQL_DATABASE_PASSWORD,
       database: process.env.MYSQL_DATABASE_NAME,
-      entities: [Session, User, Otp],
+      entities: [Session, User, Otp, Scan],
       synchronize: true,
     }),
     MailerModule.forRoot({
@@ -47,6 +50,8 @@ import { Otp } from "./otp/entities/otp.entity";
     AuthModule,
     UserModule,
     OtpModule,
+    ScanModule,
+    HomeModule,
   ],
   controllers: [],
   providers: [],
