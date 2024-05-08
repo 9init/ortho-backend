@@ -38,14 +38,14 @@ export class Otp {
   })
   userId: string;
 
-  @Column()
+  @Column({ default: false })
   isUsed: boolean;
 
   @Column("datetime")
   expiresAt: Date;
 
-  @Column()
-  verifiedAt: Date;
+  @Column("datetime", { nullable: true })
+  verifiedAt?: Date;
 
   // *** Relations *** //
 

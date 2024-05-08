@@ -9,6 +9,8 @@ import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
 import { User } from "./entities/user.entity";
 import { DataSource, Repository } from "typeorm";
 import { CreateUserDto } from "./dto/create-user.dto";
+import { OtpService } from "src/otp/otp.service";
+import { OtpType } from "src/otp/entities/otp.entity";
 
 @Injectable()
 export class UserService {
@@ -17,16 +19,23 @@ export class UserService {
     private userRepository: Repository<User>,
     @InjectDataSource()
     private userDS: DataSource,
+    private readonly otpService: OtpService,
   ) {}
 
   createOne(userDto: CreateUserDto) {
     const user = this.userRepository.create(userDto);
-    return this.userRepository.save(user).catch((err) => {
-      console.log(err);
-      if (err.code == "ER_DUP_ENTRY") {
-        throw new ConflictException("email already exists.");
-      }
-    });
+    return this.userRepository
+      .save(user)
+      .then((res) => {
+        this.otpService.createOtp(res, OtpType.VERIFY_EMAIL);
+        return res;
+      })
+      .catch((err) => {
+        console.log(err);
+        if (err.code == "ER_DUP_ENTRY") {
+          throw new ConflictException("email already exists.");
+        }
+      });
   }
 
   async findOne(id: string): Promise<User | undefined> {

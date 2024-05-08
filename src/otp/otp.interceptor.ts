@@ -5,9 +5,7 @@ import {
   CallHandler,
   Inject,
 } from "@nestjs/common";
-import { throwError } from "rxjs";
-import { catchError, map } from "rxjs/operators";
-import * as http from "http";
+import { tap } from "rxjs/operators";
 import { Reflector } from "@nestjs/core";
 import { OtpType } from "src/otp/entities/otp.entity";
 import { OTP_KEY } from "src/otp/otp.decorator";
@@ -19,7 +17,7 @@ export interface Response<T> {
 }
 
 @Injectable()
-export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
+export class OtpInterceptor<T> implements NestInterceptor<T, Response<T>> {
   @Inject() private reflector: Reflector;
   @Inject() private otpService: OtpService;
 
@@ -30,24 +28,11 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
     ]);
 
     return next.handle().pipe(
-      map((data) => {
+      tap(async () => {
         if (otpTypes?.length) {
           const user = context.switchToHttp().getRequest().user as User;
-          this.otpService.deleteOTPs(user, otpTypes);
+          await this.otpService.deleteOTPs(user, otpTypes);
         }
-
-        return {
-          data: data,
-          status:
-            http.STATUS_CODES[context.switchToHttp().getResponse().statusCode],
-          message: data?.message,
-        };
-      }),
-
-      catchError((error) => {
-        const res = error.response;
-        if (typeof res?.message == "string") res.message = [res.message];
-        return throwError(() => error);
       }),
     );
   }

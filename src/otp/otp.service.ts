@@ -3,6 +3,7 @@ import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
 import { Otp, OtpType } from "./entities/otp.entity";
 import { DataSource, In, Repository } from "typeorm";
 import { User } from "src/user/entities/user.entity";
+import { MailService } from "src/mail/mail.service";
 
 @Injectable()
 export class OtpService {
@@ -11,6 +12,7 @@ export class OtpService {
     private userRepository: Repository<Otp>,
     @InjectDataSource()
     private userDS: DataSource,
+    private readonly mailService: MailService,
   ) {}
 
   verify(id: string, otpCode: string, user: User) {
@@ -48,8 +50,15 @@ export class OtpService {
       await queryRunner.manager.delete(Otp, { userId: user.id, type });
       await queryRunner.manager.save(otp);
       await queryRunner.commitTransaction();
+
+      this.mailService.sendEmail(
+        user.email,
+        "OTP",
+        `here is your OTP: ${code}`,
+      );
     } catch (error) {
       await queryRunner.rollbackTransaction();
+      console.log(error);
       throw new BadRequestException("Failed to create OTP.");
     }
   }
