@@ -56,7 +56,7 @@ export class ScanService {
     const protrusion: PredictResult = {
       title: "Protrusion",
       description: "The distance between the front teeth.",
-      classes: [0.94],
+      classes: [0],
       labels: ["Protrusion"],
       predictedIndex: 0,
     };
