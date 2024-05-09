@@ -15,13 +15,13 @@ export class OtpService {
     private readonly mailService: MailService,
   ) {}
 
-  async verify(otpCode: string, user: User) {
+  async verify(id: string, otpCode: string) {
     const otp = await this.userRepository
       .createQueryBuilder("otp")
-      .where("otp.otp = :otpCode", { otpCode })
+      .where("otp.id = :id", { id })
+      .andWhere("otp.otp = :otpCode", { otpCode })
       .andWhere("otp.expiresAt > NOW()")
       .andWhere("otp.isUsed = 0")
-      .andWhere("otp.userId = :userId", { userId: user.id })
       .andWhere("otp.verifiedAt IS NULL")
       .getOne();
 
