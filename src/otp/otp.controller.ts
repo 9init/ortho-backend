@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Param } from "@nestjs/common";
+import { Controller, Post, Body, UseGuards } from "@nestjs/common";
 import { OtpService } from "./otp.service";
 import { AuthGuard } from "src/auth/auth.guard";
 import { LoggedInUser } from "src/user/logged-in-user.decorator";
