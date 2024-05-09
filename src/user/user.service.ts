@@ -26,9 +26,9 @@ export class UserService {
     const user = this.userRepository.create(userDto);
     return this.userRepository
       .save(user)
-      .then((res) => {
-        this.otpService.createOtp(res, OtpType.VERIFY_EMAIL);
-        return res;
+      .then(async (res) => {
+        const otp = await this.otpService.createOtp(res, OtpType.VERIFY_EMAIL);
+        return otp.id;
       })
       .catch((err) => {
         console.log(err);

@@ -51,7 +51,7 @@ export class OtpService {
 
     try {
       await queryRunner.manager.delete(Otp, { userId: user.id, type });
-      await queryRunner.manager.save(otp);
+      const otpDb = await queryRunner.manager.save(otp);
       await queryRunner.commitTransaction();
 
       this.mailService.sendEmail(
@@ -59,6 +59,8 @@ export class OtpService {
         "OTP",
         `here is your OTP: ${code}`,
       );
+
+      return otpDb;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       console.log(error);
