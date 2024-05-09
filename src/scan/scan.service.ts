@@ -16,7 +16,7 @@ export class ScanService {
     const lipline: PredictResult = {
       title: "Lipline",
       description: "A line that is drawn around the lips.",
-      classes: [0.012758, 0.323, 0.987242],
+      classes: [0.012758, 0.987242, 0.323],
       labels: ["Low", "Medium", "High"],
       predictedIndex: 2,
     };
@@ -29,9 +29,57 @@ export class ScanService {
       predictedIndex: 0,
     };
 
+    const smileArc: PredictResult = {
+      title: "Smile Arc",
+      description: "The curve of the upper incisal edges of the teeth.",
+      classes: [0.94, 0.572, 0.214],
+      labels: ["Flat", "Reverse", "Ideal"],
+      predictedIndex: 0,
+    };
+
+    const spacing: PredictResult = {
+      title: "Spacing",
+      description: "The space between the teeth.",
+      classes: [0.94],
+      labels: ["Spacings"],
+      predictedIndex: 0,
+    };
+
+    const distmal: PredictResult = {
+      title: "Distma",
+      description: "The distance between the front teeth.",
+      classes: [0.94],
+      labels: ["Distmal"],
+      predictedIndex: 0,
+    };
+
+    const protrusion: PredictResult = {
+      title: "Protrusion",
+      description: "The distance between the front teeth.",
+      classes: [0.94],
+      labels: ["Protrusion"],
+      predictedIndex: 0,
+    };
+
+    const blackTriangle: PredictResult = {
+      title: "Black Triangle",
+      description: "The space between the teeth.",
+      classes: [0.0],
+      labels: ["Black Triangle"],
+      predictedIndex: 0,
+    };
+
     const scanData: Scan = new Scan();
     scanData.userId = user.id;
-    scanData.data = [lipline, buccalCorridor];
+    scanData.data = [
+      lipline,
+      buccalCorridor,
+      smileArc,
+      spacing,
+      distmal,
+      protrusion,
+      blackTriangle,
+    ];
     scanData.image = compressedImage.toString();
 
     const scanModel = await this.scanRepository.create(scanData);
