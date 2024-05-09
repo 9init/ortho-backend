@@ -10,11 +10,7 @@ export class OtpController {
   constructor(private readonly otpService: OtpService) {}
 
   @Post("verify/:id")
-  verify(
-    @Param("id") id: string,
-    @Body("otp") otp: string,
-    @LoggedInUser() user: User,
-  ) {
-    return this.otpService.verify(id, otp, user);
+  verify(@Body("otp") otp: string, @LoggedInUser() user: User) {
+    return this.otpService.verify(otp, user);
   }
 }

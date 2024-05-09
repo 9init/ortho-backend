@@ -15,24 +15,27 @@ export class OtpService {
     private readonly mailService: MailService,
   ) {}
 
-  verify(id: string, otpCode: string, user: User) {
-    const otp = this.userRepository
+  async verify(otpCode: string, user: User) {
+    const otp = await this.userRepository
       .createQueryBuilder("otp")
-      .where("otp.id = :id", { id })
-      .andWhere("otp.otp = :otpCode", { otpCode })
+      .where("otp.otp = :otpCode", { otpCode })
       .andWhere("otp.expiresAt > NOW()")
-      .andWhere("otp.used = 0")
+      .andWhere("otp.isUsed = 0")
       .andWhere("otp.userId = :userId", { userId: user.id })
+      .andWhere("otp.verifiedAt IS NULL")
       .getOne();
 
     if (!otp) {
       throw new BadRequestException("Invalid OTP code.");
     }
 
-    // Handle the verification type here
+    otp.verifiedAt = new Date();
+    otp.isUsed = true;
+    this.userRepository.save(otp);
 
-    // if (otp.type === OtpType.RESET_PASSWORD)
+    return;
   }
+
   async createOtp(user: User, type: OtpType) {
     const code = Math.floor(10000 + Math.random() * 90000);
     const otpObj = new Otp();
