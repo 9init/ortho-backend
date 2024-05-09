@@ -9,7 +9,7 @@ import { User } from "src/user/entities/user.entity";
 export class OtpController {
   constructor(private readonly otpService: OtpService) {}
 
-  @Post("verify/:id")
+  @Post("verify")
   verify(@Body("otp") otp: string, @LoggedInUser() user: User) {
     return this.otpService.verify(otp, user);
   }
