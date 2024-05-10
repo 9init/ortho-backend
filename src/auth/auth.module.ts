@@ -5,10 +5,12 @@ import { UserModule } from "src/user/user.module";
 import { JwtModule } from "@nestjs/jwt";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Session } from "./entities/session.entity";
+import { OtpModule } from "src/otp/otp.module";
 
 @Module({
   imports: [
     forwardRef(() => UserModule),
+    OtpModule,
     TypeOrmModule.forFeature([Session]),
     JwtModule.registerAsync({
       global: true,

@@ -36,11 +36,17 @@ export class User implements CreateUserDto {
   @Exclude()
   password: string;
 
+  @Column({ default: false })
+  emailVerified: boolean;
+
+  @Column({ default: false })
+  canChangePassword: boolean;
+
   @DeleteDateColumn()
   deletedAt?: Date;
 
   // Relations
   // join otps table using user_id and where otp.isUsed = false and otp.expiresAt > now()
-  @OneToMany(() => Otp, (otp) => otp.user)
+  @OneToMany(() => Otp, (otp) => otp.user, { cascade: true })
   otps: Otp[];
 }

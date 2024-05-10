@@ -60,17 +60,23 @@ export class AuthService extends TypeOrmQueryService<Session> {
 
   async signUp(singUpDto: SignUpDto) {
     const { continuationKey, password } = singUpDto;
-    const payload = (await this.jwtService.verifyAsync(continuationKey)) as {
-      name: string;
-      email: string;
-    };
+    try {
+      const payload = (await this.jwtService.verifyAsync(continuationKey)) as {
+        name: string;
+        email: string;
+      };
 
-    const user = new CreateUserDto();
-    user.name = payload.name;
-    user.email = payload.email;
-    user.password = password;
+      const user = new CreateUserDto();
+      user.name = payload.name;
+      user.email = payload.email;
+      user.password = password;
 
-    return this.userService.createOne(plainToInstance(CreateUserDto, user));
+      return this.userService.createOne(plainToInstance(CreateUserDto, user));
+    } catch (err) {
+      throw new BadRequestException(
+        "Session expired, please request a new sign up request.",
+      );
+    }
   }
 
   async signIn(signInDto: SignInDto): Promise<User> {
