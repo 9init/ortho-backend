@@ -17,3 +17,6 @@ JWT_SECRET=strong_random_text
 # HOST URL
 HOST=http://localhost:3000
 HOST_DOMAIN=localhost:3000
+
+# Models Host
+MODEL_HOST=http://127.0.0.1:5000

@@ -1,9 +1,25 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { User } from "src/user/entities/user.entity";
 import { compriseImage } from "src/shared/image.helper";
-import { PredictResult, Scan } from "./entities/scan.entity";
+import { Scan } from "./entities/scan.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
+// import { File } from "@web-std/file";
+
+import axios from "axios";
+
+export class Predictions {
+  title: string;
+  description: string;
+  classes: number[];
+  labels: string[];
+  predictedIndex: number;
+}
+
+export class ScanResult {
+  image: string;
+  predictions: Predictions[];
+}
 
 @Injectable()
 export class ScanService {
@@ -12,80 +28,43 @@ export class ScanService {
   ) {}
   async scanFile(user: User, file: Express.Multer.File) {
     const compressedImage = await compriseImage(file);
+    const modelHost = process.env.MODEL_HOST;
 
-    const lipline: PredictResult = {
-      title: "Lipline",
-      description: "A line that is drawn around the lips.",
-      classes: [0.012758, 0.987242, 0.323],
-      labels: ["Low", "Medium", "High"],
-      predictedIndex: 2,
-    };
+    // send form data container the compressed image as file - multipart
+    const formData = new FormData();
+    const blob = new Blob([Buffer.from(compressedImage, "base64")], {
+      type: "image/jpeg",
+    });
+    // const fileOF = new File([blob], "image.jpg");
+    formData.append("file", blob);
 
-    const buccalCorridor: PredictResult = {
-      title: "Buccal Corridor",
-      description: "The dark space between the upper molars and the cheek.",
-      classes: [0.94, 0.572, 0.214],
-      labels: ["Low", "Medium", "High"],
-      predictedIndex: 0,
-    };
+    try {
+      // call the api
+      const response = await axios.post(`${modelHost}/scan`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-    const smileArc: PredictResult = {
-      title: "Smile Arc",
-      description: "The curve of the upper incisal edges of the teeth.",
-      classes: [0.94, 0.572, 0.214],
-      labels: ["Flat", "Reverse", "Ideal"],
-      predictedIndex: 0,
-    };
+      // parse response to ScanResult class
+      const scanResult: ScanResult = response.data;
+      const scanData: Scan = new Scan();
+      scanData.userId = user.id;
+      scanData.data = scanResult.predictions;
+      scanData.image = scanResult.image;
 
-    const spacing: PredictResult = {
-      title: "Spacing",
-      description: "The space between the teeth.",
-      classes: [0.94],
-      labels: ["Spacings"],
-      predictedIndex: 0,
-    };
-
-    const distmal: PredictResult = {
-      title: "Distma",
-      description: "The distance between the front teeth.",
-      classes: [0.94],
-      labels: ["Distmal"],
-      predictedIndex: 0,
-    };
-
-    const protrusion: PredictResult = {
-      title: "Protrusion",
-      description: "The distance between the front teeth.",
-      classes: [0],
-      labels: ["Protrusion"],
-      predictedIndex: 0,
-    };
-
-    const blackTriangle: PredictResult = {
-      title: "Black Triangle",
-      description: "The space between the teeth.",
-      classes: [0.0],
-      labels: ["Black Triangle"],
-      predictedIndex: 0,
-    };
-
-    const scanData: Scan = new Scan();
-    scanData.userId = user.id;
-    scanData.data = [
-      lipline,
-      buccalCorridor,
-      smileArc,
-      spacing,
-      distmal,
-      protrusion,
-      blackTriangle,
-    ];
-    scanData.image = compressedImage.toString();
-
-    const scanModel = await this.scanRepository.create(scanData);
-    const scan = await this.scanRepository.save(scanModel);
-    scan.image = process.env.HOST + "/scan/image/" + scan.id;
-    return scan;
+      const scanModel = await this.scanRepository.create(scanData);
+      const scan = await this.scanRepository.save(scanModel);
+      scan.image = process.env.HOST + "/scan/image/" + scan.id;
+      return scan;
+    } catch (err) {
+      // handle 400 error
+      if (err?.response?.status == 400) {
+        throw new BadRequestException("Invalid image, no face detected");
+      } else {
+        throw new BadRequestException("Failed to scan image");
+      }
+    }
   }
 
   async getImage(id: number) {
