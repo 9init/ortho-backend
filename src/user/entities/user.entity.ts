@@ -40,6 +40,7 @@ export class User implements CreateUserDto {
   emailVerified: boolean;
 
   @Column({ default: false })
+  @Exclude()
   canChangePassword: boolean;
 
   @DeleteDateColumn()

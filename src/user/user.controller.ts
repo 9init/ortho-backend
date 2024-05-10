@@ -27,4 +27,9 @@ export class UserController {
   update(@LoggedInUser() user: User, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(user, updateUserDto);
   }
+
+  @Get()
+  getUser(@LoggedInUser() user: User) {
+    return user;
+  }
 }
