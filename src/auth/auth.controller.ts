@@ -77,7 +77,7 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Post("/reset-password")
+  @Post("/reset")
   resetPassword(@Body() resetDto: ResetPasswordDto) {
     return this.authService.resetPassword(resetDto);
   }
