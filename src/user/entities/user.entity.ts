@@ -43,6 +43,9 @@ export class User implements CreateUserDto {
   @Exclude()
   canChangePassword: boolean;
 
+  @Column("char", { length: 100, default: null })
+  resetPasswordToken?: string;
+
   @DeleteDateColumn()
   deletedAt?: Date;
 

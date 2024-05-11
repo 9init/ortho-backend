@@ -20,6 +20,9 @@ import { SignUpRequestDto } from "./dto/singup-request.dto";
 import { SignUpDto } from "./dto/singup.dto";
 import { CreateUserDto } from "src/user/dto/create-user.dto";
 import { plainToInstance } from "class-transformer";
+import { OtpService } from "src/otp/otp.service";
+import { OtpType } from "src/otp/entities/otp.entity";
+import { ResetPasswordDto } from "./dto/reset-dto";
 
 const deviceDetector = new DeviceDetector({
   clientIndexes: true,
@@ -35,6 +38,7 @@ export class AuthService extends TypeOrmQueryService<Session> {
     private readonly userService: UserService,
     @InjectRepository(Session)
     public sessionRepository: Repository<Session>,
+    private readonly otpService: OtpService,
   ) {
     super(sessionRepository, { useSoftDelete: true });
   }
@@ -119,5 +123,20 @@ export class AuthService extends TypeOrmQueryService<Session> {
 
   async logout(tokenSignature: string) {
     return this.sessionRepository.softDelete({ tokenSignature });
+  }
+
+  async requestReset(email: string) {
+    const user = await this.userService.findOneByEmail(email);
+
+    if (!user) {
+      throw new BadRequestException("User not found");
+    }
+
+    const otp = await this.otpService.createOtp(user, OtpType.RESET_PASSWORD);
+    return otp.id;
+  }
+
+  async resetPassword(resetDto: ResetPasswordDto) {
+    await this.userService.resetPassword(resetDto.token, resetDto.password);
   }
 }

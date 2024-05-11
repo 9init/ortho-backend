@@ -11,6 +11,8 @@ import { DataSource, QueryRunner, Repository } from "typeorm";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { OtpService } from "src/otp/otp.service";
 import { OtpType } from "src/otp/entities/otp.entity";
+import * as crypto from "crypto";
+import { hashPasswordSync } from "src/decorators/hash-password/helper";
 
 @Injectable()
 export class UserService {
@@ -97,7 +99,29 @@ export class UserService {
 
   async allowPasswordReset(id: string, queryRunner: QueryRunner) {
     const user = await this.userRepository.findOneBy({ id });
+    const token = crypto.randomBytes(50).toString("hex");
+
     user.canChangePassword = true;
+    user.resetPasswordToken = token;
+
     await queryRunner.manager.save(user);
+    return token;
+  }
+
+  async resetPassword(token: string, password: string) {
+    const user = await this.userRepository.findOneBy({
+      resetPasswordToken: token,
+      canChangePassword: true,
+    });
+
+    if (!user) {
+      throw new NotFoundException("Invalid token.");
+    }
+
+    user.password = hashPasswordSync(password);
+    user.canChangePassword = false;
+    user.resetPasswordToken = null;
+
+    await this.userRepository.save(user);
   }
 }

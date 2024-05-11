@@ -48,12 +48,19 @@ export class OtpService {
     try {
       await queryRunner.manager.save(otp);
 
-      if (otp.type === OtpType.RESET_PASSWORD)
-        await this.userService.allowPasswordReset(otp.userId, queryRunner);
-      else if (otp.type === OtpType.VERIFY_EMAIL)
+      let data = null;
+      if (otp.type === OtpType.RESET_PASSWORD) {
+        data = await this.userService.allowPasswordReset(
+          otp.userId,
+          queryRunner,
+        );
+      } else if (otp.type === OtpType.VERIFY_EMAIL) {
         await this.userService.verifyEmail(otp.userId, queryRunner);
+      }
 
       await queryRunner.commitTransaction();
+
+      if (data) return data;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       console.log(error);
@@ -75,13 +82,14 @@ export class OtpService {
     const _queryRunner = queryRunner || this.userDS.createQueryRunner();
     if (!queryRunner) {
       await _queryRunner.connect();
+      await _queryRunner.startTransaction();
     }
 
     try {
-      await queryRunner.manager.delete(Otp, { userId: user.id, type });
-      const otpDb = await queryRunner.manager.save(otp);
+      await _queryRunner.manager.delete(Otp, { userId: user.id, type });
+      const otpDb = await _queryRunner.manager.save(otp);
 
-      if (!queryRunner) await queryRunner.commitTransaction();
+      if (!queryRunner) await _queryRunner.commitTransaction();
 
       this.mailService.sendEmail(
         user.email,
@@ -91,7 +99,7 @@ export class OtpService {
 
       return otpDb;
     } catch (error) {
-      await queryRunner.rollbackTransaction();
+      await _queryRunner.rollbackTransaction();
       console.log(error);
       throw new BadRequestException("Failed to create OTP.");
     }

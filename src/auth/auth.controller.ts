@@ -16,6 +16,8 @@ import { AuthGuard } from "./auth.guard";
 import { SignedAccessToken } from "src/user/user-token.decorator";
 import { SignUpRequestDto } from "./dto/singup-request.dto";
 import { SignUpDto } from "./dto/singup.dto";
+import { RequestResetDto } from "./dto/request-reset.dto";
+import { ResetPasswordDto } from "./dto/reset-dto";
 
 @Controller("auth")
 export class AuthController {
@@ -66,5 +68,17 @@ export class AuthController {
   @UseGuards(AuthGuard)
   tokenInfo(@SignedAccessToken() tokenSignature: string) {
     return this.authService.tokenInfo(tokenSignature);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post("/request-reset")
+  requestReset(@Body() { email }: RequestResetDto) {
+    return this.authService.requestReset(email);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post("/reset-password")
+  resetPassword(@Body() resetDto: ResetPasswordDto) {
+    return this.authService.resetPassword(resetDto);
   }
 }
