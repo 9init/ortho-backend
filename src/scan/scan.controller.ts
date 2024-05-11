@@ -33,11 +33,11 @@ export class ScanController {
   @Get("/image/:id")
   @Header("Content-Type", "image/jpeg")
   async getImage(
-    @Res({ passthrough: true }) res: Response,
+    @Res() res: Response,
     @LoggedInUser() user: User,
     @Param("id") id: number,
   ) {
     const imageBuffer = await this.scanService.getImage(user, id);
-    res.send(imageBuffer);
+    return res.send(imageBuffer);
   }
 }
