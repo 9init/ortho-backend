@@ -16,12 +16,12 @@ import { User } from "src/user/entities/user.entity";
 import { AuthGuard } from "src/auth/auth.guard";
 
 @Controller("scan")
-@UseGuards(AuthGuard)
 export class ScanController {
   constructor(private readonly scanService: ScanService) {}
 
   @Post()
   @UseInterceptors(FileInterceptor("file"))
+  @UseGuards(AuthGuard)
   scanFile(
     @LoggedInUser() user: User,
     @UploadedFile() file: Express.Multer.File,
@@ -31,9 +31,9 @@ export class ScanController {
 
   @Get("/image/:id")
   async getImage(
-    @Res() res: Response,
     @LoggedInUser() user: User,
     @Param("id") id: number,
+    @Res() res: Response,
   ) {
     const imageBuffer = await this.scanService.getImage(user, id);
     res.setHeader("Content-Type", "image/jpeg");
