@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module } from "@nestjs/common";
 import { AuthModule } from "./auth/auth.module";
 import { UserModule } from "./user/user.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
@@ -13,6 +13,7 @@ import { Otp } from "./otp/entities/otp.entity";
 import { ScanModule } from "./scan/scan.module";
 import { HomeModule } from "./home/home.module";
 import { Scan } from "./scan/entities/scan.entity";
+import { LoggerMiddleware } from "./middleware/logger.middleware";
 
 @Module({
   imports: [
@@ -56,4 +57,8 @@ import { Scan } from "./scan/entities/scan.entity";
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes("*");
+  }
+}
