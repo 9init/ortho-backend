@@ -4,8 +4,7 @@ import { compriseImage } from "src/shared/image.helper";
 import { Scan } from "./entities/scan.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-// import { File } from "@web-std/file";
-
+import * as crypto from "crypto";
 import axios from "axios";
 
 export class Predictions {
@@ -36,7 +35,8 @@ export class ScanService {
       type: "image/jpeg",
     });
     // const fileOF = new File([blob], "image.jpg");
-    formData.append("file", blob);
+    const randomName = crypto.randomBytes(10).toString("hex") + ".jpg";
+    formData.append("file", blob, randomName);
 
     try {
       // call the api
@@ -67,8 +67,8 @@ export class ScanService {
     }
   }
 
-  async getImage(id: number) {
-    const scan = await this.scanRepository.findOneBy({ id });
+  async getImage(user, id: number) {
+    const scan = await this.scanRepository.findOneBy({ id, userId: user.id });
 
     if (!scan) {
       throw new BadRequestException("Scan not found");
