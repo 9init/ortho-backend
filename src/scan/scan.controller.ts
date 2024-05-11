@@ -7,7 +7,9 @@ import {
   Param,
   Header,
   UseGuards,
+  Res,
 } from "@nestjs/common";
+import { Response } from "express";
 import { ScanService } from "./scan.service";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { LoggedInUser } from "src/user/logged-in-user.decorator";
@@ -30,8 +32,12 @@ export class ScanController {
 
   @Get("/image/:id")
   @Header("Content-Type", "image/jpeg")
-  async getImage(@LoggedInUser() user: User, @Param("id") id: number) {
+  async getImage(
+    @Res({ passthrough: true }) res: Response,
+    @LoggedInUser() user: User,
+    @Param("id") id: number,
+  ) {
     const imageBuffer = await this.scanService.getImage(user, id);
-    return imageBuffer;
+    res.send(imageBuffer);
   }
 }
