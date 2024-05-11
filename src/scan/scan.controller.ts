@@ -5,10 +5,10 @@ import {
   UploadedFile,
   Get,
   Param,
-  Header,
   UseGuards,
-  StreamableFile,
+  Res,
 } from "@nestjs/common";
+import { Response } from "express";
 import { ScanService } from "./scan.service";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { LoggedInUser } from "src/user/logged-in-user.decorator";
@@ -30,8 +30,13 @@ export class ScanController {
   }
 
   @Get("/image/:id")
-  async getImage(@LoggedInUser() user: User, @Param("id") id: number) {
+  async getImage(
+    @Res() res: Response,
+    @LoggedInUser() user: User,
+    @Param("id") id: number,
+  ) {
     const imageBuffer = await this.scanService.getImage(user, id);
-    return new StreamableFile(imageBuffer, { type: "image/jpeg" });
+    res.setHeader("Content-Type", "image/jpeg");
+    res.send(imageBuffer);
   }
 }
