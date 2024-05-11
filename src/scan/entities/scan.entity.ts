@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "src/user/entities/user.entity";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 
 @Entity()
 export class Scan {
@@ -19,6 +26,11 @@ export class Scan {
 
   @Column("datetime", { default: () => "CURRENT_TIMESTAMP" })
   createdAt: Date;
+
+  // Relation
+  @ManyToOne(() => User, (user) => user.id, { onDelete: "CASCADE" })
+  @JoinColumn({ name: "userId" })
+  user: User;
 }
 
 export class PredictResult {
