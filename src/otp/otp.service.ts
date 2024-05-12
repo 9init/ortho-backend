@@ -67,7 +67,7 @@ export class OtpService {
       throw new BadRequestException("Failed to verify OTP.");
     }
 
-    return;
+    return "true"; // force return a stringified boolean
   }
 
   async createOtp(user: User, type: OtpType, queryRunner: QueryRunner = null) {
