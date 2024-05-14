@@ -1,30 +1,13 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
-
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+This project is the backend for an Ortho application. It acts as an API server, handling incoming requests and utilizing functionalities provided by Ortho AI APIs.
+
+## Prerequisites
+
+1. Install [Ortho AI](https://github.com/9init/ortho-ai-backend) and make sure the port is exposed.
+2. NodeJS v18.17.0 at least.
+3. Install [pnpm package manager](https://pnpm.io/installation).
+4. [MySQL 8](https://dev.mysql.com/downloads/mysql/) at least.
 
 ## Installation
 
@@ -36,6 +19,13 @@ $ pnpm install
 
 1. Locate the `ENVEXAMPLE` file within the repository and copy it as `.env`. This file will serve as the configuration file for your environment variables. Follow the steps below:
 2. Open the .env file using a text editor of your choice. You'll find example environment variables provided in the ENVEXAMPLE file. Update these variables with the actual data specific to your project.
+3. Create the database using the following command:
+    ```bash
+    mysql -u <MYSQL_DATABASE_USER> -p -e 'create database <MYSQL_DATABASE_NAME>;'
+    ```
+    - replace `<MYSQL_DATABASE_USER>` with your database username.
+    - replace `<MYSQL_DATABASE_NAME>` with your database name. 
+    - make sure both of them are same as in the `.env` file.
 
 **Note**: `MODEL_HOST` represents the URL for the models API. You'll find instructions on setting up the models API server in the repository. Refer to the documentation or setup guide available in [Ortho AI](https://github.com/9init/ortho-ai-backend) Repository
 
@@ -48,17 +38,3 @@ $ pnpm run start
 # watch mode
 $ pnpm run start:dev
 ```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
