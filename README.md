@@ -32,6 +32,13 @@
 $ pnpm install
 ```
 
+## Set Environment Variables
+
+1. Locate the `ENVEXAMPLE` file within the repository and copy it as `.env`. This file will serve as the configuration file for your environment variables. Follow the steps below:
+2. Open the .env file using a text editor of your choice. You'll find example environment variables provided in the ENVEXAMPLE file. Update these variables with the actual data specific to your project.
+
+**Note**: `MODEL_HOST` represents the URL for the models API. You'll find instructions on setting up the models API server in the repository. Refer to the documentation or setup guide available in [Ortho AI](https://github.com/9init/ortho-ai-backend) Repository
+
 ## Running the app
 
 ```bash
@@ -40,22 +47,6 @@ $ pnpm run start
 
 # watch mode
 $ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
 ```
 
 ## Support
